@@ -2,6 +2,35 @@
 
 This web service provides an `/identify` endpoint to reconcile customer contact information. As a customer places multiple orders using various permutations of email addresses and phone numbers, this service identifies connected contact identities and resolves them into unified clusters.
 
+## 🌐 Live Endpoint
+
+**Base URL:** `https://your-app-name.onrender.com`
+
+**Identify Endpoint:** `POST https://your-app-name.onrender.com/identify`
+
+### Example Request
+
+```bash
+curl -X POST https://your-app-name.onrender.com/identify \
+  -H "Content-Type: application/json" \
+  -d '{"email": "doc@fluxkart.com", "phoneNumber": "123456"}'
+```
+
+### Response Format
+
+```json
+{
+  "contact": {
+    "primaryContatctId": 1,
+    "emails": ["doc@fluxkart.com"],
+    "phoneNumbers": ["123456"],
+    "secondaryContactIds": []
+  }
+}
+```
+
+> **Note:** Use **JSON Body** and not form-data for request payloads.
+
 ## 🚀 Setup & Execution
 
 ### Prerequisites
@@ -48,7 +77,43 @@ npm run test
 
 ---
 
-## 🏗️ Architecture
+## ☁️ Deployment to Render.com
+
+### Option 1: Deploy with PostgreSQL (Recommended for Production)
+
+1. **Create a Render Account:** Go to [render.com](https://render.com) and sign up
+
+2. **Create a PostgreSQL Database:**
+   - Click "New" → "PostgreSQL"
+   - Give it a name (e.g., `bitespeed-db`)
+   - Note the "Internal Database URL" after creation
+
+3. **Create a Web Service:**
+   - Click "New" → "Web Service"
+   - Connect your GitHub repository
+   - Configure:
+     - Build Command: `npm run build`
+     - Start Command: `node dist/index.js`
+   - Add Environment Variables:
+     - `DATABASE_URL`: (the PostgreSQL connection string from step 2)
+     - `PORT`: `3000`
+     - `NODE_ENV`: `production`
+
+4. **Deploy:** Click "Create Web Service"
+
+### Option 2: Deploy with Docker
+
+1. Build and push Docker image to Docker Hub or use GitHub Container Registry
+
+2. On Render, create a "Web Service" and select "Docker" as the runtime
+
+3. Add environment variables:
+   - `DATABASE_URL`: PostgreSQL connection string
+   - `PORT`: `3000`
+
+---
+
+## 📝 API Documentation
 
 Identity reconciliation is treated fundamentally as a **Graph Problem**, where contact rows represent nodes, and matching fields (email or phone) form edges. The graph algorithm connects related subsets of contacts into unified components (Clusters).
 
